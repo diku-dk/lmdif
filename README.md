@@ -14,6 +14,13 @@ honour of that original FORTRAN program.
 The porting to Futhark was done as part of a larger project while
 Troels Henriksen was visiting [SimCorp](https://www.simcorp.com/).
 
+## Installation
+
+```
+$ futhark-pkg add github.com/diku-dk/lmdif
+$ futhark-pkg sync
+```
+
 ## Usage
 
 Usage is slightly involved.  See [this test
