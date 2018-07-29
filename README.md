@@ -19,5 +19,5 @@ Troels Henriksen was visiting [SimCorp](https://www.simcorp.com/).
 Usage is slightly involved.  See [this test
 program](blob/master/lib/github.com/diku-dk/lmdif/lmdif_tests.fut) for
 an example.  You will need to write your own distance functions.  The
-library [github.com/athas/distance](https://github.com/athas/distance)
+package [github.com/athas/distance](https://github.com/athas/distance)
 might be useful.
