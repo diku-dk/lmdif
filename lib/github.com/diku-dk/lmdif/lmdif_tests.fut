@@ -8,15 +8,15 @@ module fitter = mk_lmdif f32 xorshift128plus
 -- For the test, we will be trying to find polynomial coefficients
 -- based on point samples.
 
-let polynomial [d] (coefficients: [d]f32) (variables: [d]f32): f32 =
+let polynomial [d] (coefficients: [d]f32) (x: f32): f32 =
   iota d
   |> map r32
-  |> map2 (**) variables
+  |> map (x**)
   |> map2 (*) coefficients
   |> f32.sum
 
-let max_global = 40000
-let np = 30
+let max_global = 10000
+let np = 20
 
 -- We will be generating polynomials whose coefficients are the
 -- Fibonacci sequence.  Mostly for fun, but also for easier eyeballing
@@ -30,19 +30,19 @@ let fibs (n: i32): [n]i32 =
   in scan mul (1,0,0,1) (replicate n (1,1,1,0)) |> map (.2)
 
 -- Used for generating the data set, but not for testing.
-entry gen_data [d] (xss: [][d]f32) =
-  (xss, map (polynomial (fibs d |> map r32)) xss)
+entry gen_data (d: i32) (xs: []f32) =
+  (d, xs, map (polynomial (fibs d |> map r32)) xs)
 
 -- ==
 -- entry: test_fibs
--- compiled input @ data/fibs7.in.gz
--- output { [1,1,2,3,5,8,13] }
-entry test_fibs [d] (xss: [][d]f32) (fs: []f32) =
+-- compiled input @ data/fibs5.in.gz
+-- output { [1,1,2,3,5] }
+entry test_fibs (d: i32) (xs: []f32) (fxs: []f32) =
   let dist coefficients xs f =
     f32.abs (polynomial coefficients xs - f)
   let rms = map (**2) >-> f32.sum >-> (/r32 d) >-> f32.sqrt
   let objective coefficients =
-    rms (map2 (dist coefficients) xss fs)
+    rms (map2 (dist coefficients) xs fxs)
   let var = fitter.optimize_value { lower_bound = -10
                                   , upper_bound = 10
                                   , initial_value = 0 }
