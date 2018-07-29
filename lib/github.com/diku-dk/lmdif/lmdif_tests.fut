@@ -40,8 +40,9 @@ entry gen_data [d] (xss: [][d]f32) =
 entry test_fibs [d] (xss: [][d]f32) (fs: []f32) =
   let dist coefficients xs f =
     f32.abs (polynomial coefficients xs - f)
+  let rms = map (**2) >-> f32.sum >-> (/r32 d) >-> f32.sqrt
   let objective coefficients =
-    map2 (dist coefficients) xss fs |> f32.sum
+    rms (map2 (dist coefficients) xss fs)
   let var = fitter.optimize_value { lower_bound = -10
                                   , upper_bound = 10
                                   , initial_value = 0 }
