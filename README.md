@@ -6,7 +6,7 @@ Levenberg-Marquardt algorithm.  Its ancestry is somewhat convoluted:
 the code is partially based on a
 [LexiFi](https://www.lexifi.com/)-provided OCaml translation of
 [MPFIT](https://www.physics.wisc.edu/~craigm/idl/cmpfit.html), which
-itself a C translation of the FORTRAN program
+is itself a C translation of the FORTRAN program
 [`lmdif.f`](http://www.netlib.org/minpack/lmdif.f) from
 [MINPACK](http://www.netlib.org/minpack/).  This package is named in
 honour of that original FORTRAN program.
