@@ -15,8 +15,8 @@ let polynomial [d] (coefficients: [d]f32) (variables: [d]f32): f32 =
   |> map2 (*) coefficients
   |> f32.sum
 
-let max_global = 30000
-let np = 50
+let max_global = 40000
+let np = 30
 
 -- We will be generating polynomials whose coefficients are the
 -- Fibonacci sequence.  Mostly for fun, but also for easier eyeballing
