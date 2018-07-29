@@ -2,7 +2,7 @@
 
 This repository contains a [Futhark](https://futhark-lang.org) package
 for doing nonlinear least-squares fitting using the
-Levenberg-Marquardt-algorithm.  Its ancestry is somewhat convoluted:
+Levenberg-Marquardt algorithm.  Its ancestry is somewhat convoluted:
 the code is partially based on a
 [LexiFi](https://www.lexifi.com/)-provided OCaml translation of
 [MPFIT](https://www.physics.wisc.edu/~craigm/idl/cmpfit.html), which
