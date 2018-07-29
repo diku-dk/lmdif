@@ -21,7 +21,9 @@ module type lmdif = {
   -- | The result of calibration, which includes the best observed
   -- parameter assignment, its error, and the number of evaluations of
   -- the objective function that was carried out before finding this
-  -- result.
+  -- result.  The error is simply the value returned by the objective
+  -- function for the parameters, and produced here only for
+  -- convenience.
   type calibration_result [num_vars] = { parameters: [num_vars]real,
                                          error: real,
                                          num_feval: i32 }
