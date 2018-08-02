@@ -19,4 +19,5 @@ install:
 script:
   - futhark-test lib
   - futhark-pkg upgrade
+  - futhark-pkg sync
   - futhark-test lib
