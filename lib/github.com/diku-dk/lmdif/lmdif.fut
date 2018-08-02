@@ -5,7 +5,7 @@
 -- be given a representation of scalars (which also doubles as the
 -- type of parameters) and a way to produce random numbers.
 
-import "/futlib/random"
+import "../cpprandom/random"
 
 -- | The type of an instantiated `mk_lmdif` module.
 module type lmdif = {

@@ -1,9 +1,9 @@
 -- | ignore
 
 import "lmdif"
-import "/futlib/random"
+import "../cpprandom/random"
 
-module fitter = mk_lmdif f32 xorshift128plus
+module fitter = mk_lmdif f32 pcg32
 
 -- For the test, we will be trying to find polynomial coefficients
 -- based on point samples.
