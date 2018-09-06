@@ -1,5 +1,5 @@
 package github.com/diku-dk/lmdif
 
 require {
-  github.com/diku-dk/cpprandom 1.0.0 #86ab0a7b8f1a430bdc43253b00d6a498bec9f899
+  github.com/diku-dk/cpprandom 1.1.1 #e70c4cdbbe8f5320eb831595a92a549e164a371d
 }
