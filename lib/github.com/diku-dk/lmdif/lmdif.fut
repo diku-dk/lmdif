@@ -209,7 +209,7 @@ module mk_lmdif (real: real)
       if max_global i32.> 0
       then let res = (optimize objective vars_to_free_vars variables
                       {np = np, cr = real.from_fraction 9 10} lower_bounds upper_bounds
-                      {max_iterations = i32.largest,
+                      {max_iterations = i32.lowest,
                        max_global = max_global,
                        target = real.i32 0})
            in (res.x0, res.num_feval)
