@@ -60,7 +60,7 @@ module mk_lmdif (real: real)
                                          num_feval: i32 }
 
   -- Pretend this is a sum type with two constructors.
-  type optimization_variable = ( bool -- fixed?
+  type optimization_variable = ( #fixed | #not_fixed -- fixed?
                                , real -- value if fixed
                                , range -- range if not fixed
                                )
@@ -73,13 +73,13 @@ module mk_lmdif (real: real)
     let (rngs', xs) = unzip (map (\rng -> random_real.rand d rng) rngs)
     in (rand.join_rng rngs', xs)
 
-  let fixed_value (v: real) =
-    (true, v, {lower_bound=real.i32 0,
-               upper_bound=real.i32 0,
-               initial_value=real.i32 0})
+  let fixed_value (v: real): optimization_variable =
+    (#fixed, v, {lower_bound=real.i32 0,
+                 upper_bound=real.i32 0,
+                 initial_value=real.i32 0})
 
-  let optimize_value (r: range) =
-    (false, real.i32 0, r)
+  let optimize_value (r: range): optimization_variable =
+    (#not_fixed, real.i32 0, r)
 
   -- Parameterisation of how the randomised search takes place.
   type mutation = {np: i32, -- Population size
@@ -99,7 +99,9 @@ module mk_lmdif (real: real)
                   (vars_to_free_vars: [num_vars]i32)
                   (variables: [num_vars]optimization_variable)
                   (xs: [num_active]real) =
-    map2 (\fv (fixed,x,_) -> if fixed then x else unsafe xs[fv])
+    map2 (\fv (fixed,x,_) -> match fixed
+                               case #fixed -> x
+                               case #not_fixed -> unsafe xs[fv])
          vars_to_free_vars variables
 
   let min_and_idx (a:real,a_i:i32) (b:real,b_i:i32) =
@@ -197,7 +199,7 @@ module mk_lmdif (real: real)
       (variables: [num_vars]optimization_variable)
       : calibration_result [num_vars] =
     let (free_vars_to_vars, free_vars) =
-      unzip (filter (\(_, (fixed, _, _)) -> !fixed) (zip (iota num_vars) variables))
+      unzip (filter ((.2) >-> (.1) >-> (==#not_fixed)) (zip (iota num_vars) variables))
     let num_free_vars = length free_vars
     let vars_to_free_vars = scatter (replicate num_vars (-1))
                                     free_vars_to_vars (iota num_free_vars)
