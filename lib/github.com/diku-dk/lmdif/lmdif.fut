@@ -40,9 +40,9 @@ module type lmdif = {
   -- objective function before termination.  `np` is the number of
   -- mutations to attempt per iteration.
   val lmdif [num_vars]:
-          (objective: [num_vars]real -> real)
+          [num_vars]optimization_variable
+       -> (objective: [num_vars]real -> real)
        -> (max_global: i32) -> (np: i32)
-       -> [num_vars]optimization_variable
        -> calibration_result [num_vars]
 }
 
@@ -193,10 +193,10 @@ module mk_lmdif (real: real)
     in {x0=x0, f=fx0, num_feval=ncalls, status=status}
 
   let lmdif [num_vars]
+      (variables: [num_vars]optimization_variable)
       (objective: []real -> real)
       (max_global: i32)
       (np: i32)
-      (variables: [num_vars]optimization_variable)
       : calibration_result [num_vars] =
     let (free_vars_to_vars, free_vars) =
       unzip (filter ((.2) >-> (.1) >-> (==#not_fixed)) (zip (iota num_vars) variables))

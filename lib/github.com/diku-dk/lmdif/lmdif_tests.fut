@@ -47,5 +47,5 @@ entry test_fibs (d: i32) (xs: []f32) (fxs: []f32) =
                                   , upper_bound = 10
                                   , initial_value = 0 }
   let vars = replicate d var
-  let r = fitter.lmdif objective max_global np vars
+  let r = fitter.lmdif vars objective max_global np
   in map (f32.round >-> t32) r.parameters
