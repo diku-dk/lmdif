@@ -17,8 +17,8 @@ Troels Henriksen was visiting [SimCorp](https://www.simcorp.com/).
 ## Installation
 
 ```
-$ futhark-pkg add github.com/diku-dk/lmdif
-$ futhark-pkg sync
+$ futhark pkg add github.com/diku-dk/lmdif
+$ futhark pkg sync
 ```
 
 ## Usage
