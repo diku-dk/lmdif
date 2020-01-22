@@ -199,7 +199,7 @@ module mk_lmdif (real: real)
       (np: i32)
       : calibration_result [num_vars] =
     let (free_vars_to_vars, free_vars) =
-      unzip (filter ((.2) >-> (.1) >-> (==#not_fixed)) (zip (iota num_vars) variables))
+      unzip (filter ((.1) >-> (.0) >-> (==#not_fixed)) (zip (iota num_vars) variables))
     let num_free_vars = length free_vars
     let vars_to_free_vars = scatter (replicate num_vars (-1))
                                     (free_vars_to_vars : [num_free_vars]i32)
