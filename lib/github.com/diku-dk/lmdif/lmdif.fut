@@ -93,7 +93,7 @@ module mk_lmdif (real: real)
   let max_global_reached: status = 1
   let target_reached: status = 2
 
-  type result = {x0: []real, f: real, num_feval: i32, status: status}
+  type result [n] = {x0: [n]real, f: real, num_feval: i32, status: status}
 
   let active_vars [num_vars] [num_active]
                   (vars_to_free_vars: [num_vars]i32)
@@ -117,7 +117,7 @@ module mk_lmdif (real: real)
                ({np, cr}: mutation)
                (lower_bounds: [num_free_vars]real)
                (upper_bounds: [num_free_vars]real)
-               ({max_iterations,max_global,target}: termination): result =
+               ({max_iterations,max_global,target}: termination): result [num_free_vars] =
     -- The objective function called only with free variables.
     let objective' x = objective (active_vars vars_to_free_vars variables x)
 
@@ -202,7 +202,7 @@ module mk_lmdif (real: real)
       unzip (filter ((.1) >-> (.0) >-> (==#not_fixed)) (zip (iota num_vars) variables))
     let num_free_vars = length free_vars
     let vars_to_free_vars = scatter (replicate num_vars (-1))
-                                    (free_vars_to_vars : [num_free_vars]i32)
+                                    (free_vars_to_vars :> [num_free_vars]i32)
                                     (iota num_free_vars)
     let (x, lower_bounds, upper_bounds) =
       unzip3 (map (\(_, _, {initial_value, lower_bound, upper_bound}) ->
