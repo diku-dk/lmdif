@@ -101,7 +101,7 @@ module mk_lmdif (real: real)
                   (xs: [num_active]real) =
     map2 (\fv (fixed,x,_) -> match fixed
                                case #fixed -> x
-                               case #not_fixed -> unsafe xs[fv])
+                               case #not_fixed -> xs[fv])
          vars_to_free_vars variables
 
   let min_and_idx (a:real,a_i:i32) (b:real,b_i:i32) =
@@ -145,9 +145,9 @@ module mk_lmdif (real: real)
        let (rng,b) = loop (rng,b) while b i32.== i || b i32.== a do random_i32.rand (0,np-1) rng
        let (rng,c) = loop (rng,c) while c i32.== i || c i32.== a || c i32.== b do random_i32.rand (0,np-1) rng
        let (rng,r) = random_real.rand bounds rng
-       let x_r1 = unsafe real.(if r <= from_fraction 1 2 then x[best_idx] else x[a])
-       let x_r2 = unsafe x[b]
-       let x_r3 = unsafe x[c]
+       let x_r1 = real.(if r <= from_fraction 1 2 then x[best_idx] else x[a])
+       let x_r2 = x[b]
+       let x_r3 = x[c]
        let (rng,j0) = random_i32.rand (0,num_free_vars-1) rng
        let (rng,rs) = nrand bounds rng num_free_vars
        let auxs = real.(map2 (+) x_r1 (map (difw*) (map2 (-) x_r2 x_r3)))
