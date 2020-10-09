@@ -68,7 +68,7 @@ module mk_lmdif (real: real)
   module random_i32 = uniform_int_distribution i32 rand
   module random_real = uniform_real_distribution real rand
 
-  let nrand (d: random_real.distribution) (rng: rand.rng) (n: i32) =
+  let nrand (d: random_real.distribution) (rng: rand.rng) (n: i64) =
     let rngs = rand.split_rng n rng
     let (rngs', xs) = unzip (map (\rng -> random_real.rand d rng) rngs)
     in (rand.join_rng rngs', xs)
@@ -82,7 +82,7 @@ module mk_lmdif (real: real)
     (#not_fixed, real.i32 0, r)
 
   -- Parameterisation of how the randomised search takes place.
-  type mutation = {np: i32, -- Population size
+  type mutation = {np: i64, -- Population size
                    cr: real  -- Crossover probability [0,1]
                    }
 
@@ -132,23 +132,25 @@ module mk_lmdif (real: real)
              in map init_i rss)
     let fx = map objective' x
     let (fx0, best_idx) =
-      reduce_comm min_and_idx (real.inf, 0) (zip (intrinsics.opaque fx) (iota np))
+      reduce_comm min_and_idx (real.inf, 0)
+                  (zip (opaque fx) (map i32.i64 (iota np)))
 
     let mutation (difw: real) (best_idx: i32) (x: [np][num_free_vars]real)
                  (rng: rand.rng) (i :i32) (x_i: [num_free_vars]real) =
       (-- We have to draw 'to_draw' distinct elements from 'x', and it
        -- can't be 'i'.  We do this with brute-force looping.
-       let (rng,a) = random_i32.rand (0,np-1) rng
-       let (rng,b) = random_i32.rand (0,np-1) rng
-       let (rng,c) = random_i32.rand (0,np-1) rng
-       let (rng,a) = loop (rng,a) while a i32.== i do random_i32.rand (0,np-1) rng
-       let (rng,b) = loop (rng,b) while b i32.== i || b i32.== a do random_i32.rand (0,np-1) rng
-       let (rng,c) = loop (rng,c) while c i32.== i || c i32.== a || c i32.== b do random_i32.rand (0,np-1) rng
+       let dist = (0,i32.i64 np-1)
+       let (rng,a) = random_i32.rand dist rng
+       let (rng,b) = random_i32.rand dist rng
+       let (rng,c) = random_i32.rand dist rng
+       let (rng,a) = loop (rng,a) while a i32.== i do random_i32.rand dist rng
+       let (rng,b) = loop (rng,b) while b i32.== i || b i32.== a do random_i32.rand dist rng
+       let (rng,c) = loop (rng,c) while c i32.== i || c i32.== a || c i32.== b do random_i32.rand dist rng
        let (rng,r) = random_real.rand bounds rng
        let x_r1 = real.(if r <= from_fraction 1 2 then x[best_idx] else x[a])
        let x_r2 = x[b]
        let x_r3 = x[c]
-       let (rng,j0) = random_i32.rand (0,num_free_vars-1) rng
+       let (rng,j0) = random_i32.rand (0,i32.i64 num_free_vars-1) rng
        let (rng,rs) = nrand bounds rng num_free_vars
        let auxs = real.(map2 (+) x_r1 (map (difw*) (map2 (-) x_r2 x_r3)))
        let bounds = zip lower_bounds upper_bounds
@@ -156,7 +158,7 @@ module mk_lmdif (real: real)
                        if i32.(j == j0) || real.(r <= cr && lower_bound <= aux && aux <= upper_bound)
                        then aux
                        else x_i_j)
-                      (iota num_free_vars) rs bounds auxs x_i
+                      (map i32.i64 (iota num_free_vars)) rs bounds auxs x_i
 
        in (rng, v_i))
 
@@ -169,21 +171,24 @@ module mk_lmdif (real: real)
        let (fx0', best_idx') =
          reduce_comm min_and_idx
                     (fx0, best_idx)
-                    (zip (intrinsics.opaque f_v) (iota np))
+                    (zip (opaque f_v) (map i32.i64 (iota np)))
        in (fx0', best_idx', fx', x'))
 
     -- We perform np invocations of the objective function per
     -- iteration of the loop.
     let (_,ncalls,num_it,(_,_,_,x)) =
       loop (rng, ncalls, num_it, (fx0, best_idx, fx, x)) =
-           (rng, np, max_iterations, (fx0, best_idx, fx, x))
+           (rng, i32.i64 np, max_iterations, (fx0, best_idx, fx, x))
       while i32.(num_it > 0) && i32.(max_global > ncalls) && real.(fx0 > target) do
       (let (rng,differential_weight) = random_real.rand (real.from_fraction 1 2, real.i32 1) rng
        let rngs = rand.split_rng np rng
-       let (rngs, v) = unzip (map3 (mutation differential_weight best_idx x) rngs (iota np) x)
+       let (rngs, v) = unzip (map3 (mutation differential_weight best_idx x)
+                                   rngs
+                                   (map i32.i64 (iota np))
+                                   x)
        let rng = rngs[0]
        let (fx0, best_idx, fx, x) = recombination fx0 best_idx fx x v
-       in (rng, ncalls i32.+ np, num_it i32.- 1,
+       in (rng, ncalls i32.+ i32.i64 np, num_it i32.- 1,
            (fx0, best_idx, fx, x)))
     let x0 = x[best_idx]
     let status = if      real.(fx0 <= target)      then target_reached
@@ -202,8 +207,8 @@ module mk_lmdif (real: real)
       unzip (filter ((.1) >-> (.0) >-> (==#not_fixed)) (zip (iota num_vars) variables))
     let num_free_vars = length free_vars
     let vars_to_free_vars = scatter (replicate num_vars (-1))
-                                    (free_vars_to_vars :> [num_free_vars]i32)
-                                    (iota num_free_vars)
+                                    (free_vars_to_vars :> [num_free_vars]i64)
+                                    (map i32.i64 (iota num_free_vars))
     let (x, lower_bounds, upper_bounds) =
       unzip3 (map (\(_, _, {initial_value, lower_bound, upper_bound}) ->
                    (initial_value, lower_bound, upper_bound)) free_vars)
@@ -211,7 +216,7 @@ module mk_lmdif (real: real)
     let (x, num_feval) =
       if max_global i32.> 0
       then let res = (optimize objective vars_to_free_vars variables
-                      {np = np, cr = real.from_fraction 9 10} lower_bounds upper_bounds
+                      {np = i64.i32 np, cr = real.from_fraction 9 10} lower_bounds upper_bounds
                       {max_iterations = i32.highest,
                        max_global = max_global,
                        target = real.i32 0})
