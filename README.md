@@ -1,4 +1,4 @@
-# Nonlinear least-squares fitting in Futhark [![Build Status](https://travis-ci.org/diku-dk/lmdif.svg?branch=master)](https://travis-ci.org/diku-dk/lmdif) [![Documentation](https://futhark-lang.org/pkgs/github.com/diku-dk/lmdif/status.svg)](https://futhark-lang.org/pkgs/github.com/diku-dk/lmdif/latest/)
+# Nonlinear least-squares fitting in Futhark [![CI](https://github.com/diku-dk/lmdif/workflows/CI/badge.svg)](https://github.com/diku-dk/lmdif/actions) [![Documentation](https://futhark-lang.org/pkgs/github.com/diku-dk/lmdif/status.svg)](https://futhark-lang.org/pkgs/github.com/diku-dk/lmdif/latest/)
 
 This repository contains a [Futhark](https://futhark-lang.org) package
 for doing nonlinear least-squares fitting using the
